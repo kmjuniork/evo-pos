@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+   <data>
+        <record id="view_users_form_evo_pos" model="ir.ui.view">
+            <field name="model">res.users</field>
+            <field name="inherit_id" ref="base.view_users_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//notebook/page[2]" position="inside">
+                    <group string="EVO POS">
+                        <field name="pin_passwd"/>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
