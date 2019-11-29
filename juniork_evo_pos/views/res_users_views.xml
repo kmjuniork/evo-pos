@@ -7,7 +7,7 @@
             <field name="arch" type="xml">
                 <xpath expr="//notebook/page[2]" position="inside">
                     <group string="EVO POS">
-                        <field name="pin_passwd"/>
+                        <field name="pin_passwd" required="1"/>
                     </group>
                 </xpath>
             </field>
