@@ -7,9 +7,9 @@ from odoo.addons.restful.common import valid_response, invalid_response, extract
 _logger = logging.getLogger(__name__)
 
 
-def validate_token(f):
-    @functools.wraps(f)
-    def wrap(*args, **kwargs):
+def validate_token(func):
+    @functools.wraps(func)
+    def wrap(self, *args, **kwargs):
         access_token = request.httprequest.headers.get('access_token')
         if not access_token:
             return invalid_response('access_token_not_found', 'missing access token in request header', 401)
