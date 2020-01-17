@@ -12,10 +12,11 @@ EVO POS FOR ODOO
 This module is juniork evo pos integration to odoo.
 """,
     'depends': [
-        'web', 'sale'
+        'web', 'sale', 'product'
     ],
     'data': [
-        "views/res_users_views.xml"
+        "views/res_users_views.xml",
+        "views/product_template_views.xml",
     ],
     'images': [],
     'installable': True,
