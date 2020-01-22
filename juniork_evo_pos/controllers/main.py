@@ -30,9 +30,10 @@ def validate_token(func):
 
 class APIController(http.Controller):
 
+    # sales profit and loss report api
     @validate_token
     @http.route("/api/profit/loss/report/", type='http', auth="none", methods=['GET'], csrf=False)
-    def get(self, **payload):
+    def profit_loss_report(self, **payload):
         data = {'used_context': {'journal_ids': False, 'state': 'posted', 'date_from': False, 'date_to': False, 'strict_range': True, 'company_id': 1, 'lang': 'en_US'}}
         if payload.get('date_from'):
             data['used_context']['date_from'] = payload['date_from']
@@ -79,6 +80,75 @@ class APIController(http.Controller):
                 lines += sorted(sub_lines, key=lambda sub_line: sub_line['name'])
 
         return valid_response(lines)
+
+    # top 5 selling product api
+    @validate_token
+    @http.route("/api/top/selling/product", type='http', auth="none", methods=['GET'], csrf=False)
+    def top_selling_product(self, **kwargs):
+        
+        limit_value = 5
+        date_option = kwargs.get('date') if kwargs.get('date') else '7days'
+        date_selected_from = None
+        date_selected = None
+        date_selected_to = None
+
+        company_id = request.env.user.company_id
+        warehouse_ids = request.env['stock.warehouse'].sudo().search([('company_id', '=', company_id)]).mapped('id')
+        print(warehouse_ids)
+        warehouse_id = kwargs.get('warehouse') if kwargs.get('warehouse') else warehouse_ids
+
+        from_date = date.today() - dateutil.relativedelta.relativedelta(years=100)
+        to_date = date.today() + dateutil.relativedelta.relativedelta(days=1)
+
+        if date_option == '7days':
+            from_date = date.today() - dateutil.relativedelta.relativedelta(days=7)
+            to_date = date.today() + dateutil.relativedelta.relativedelta(days=1)
+
+        elif date_option == 'last_month':
+            date_limit = date.today() - dateutil.relativedelta.relativedelta(months=1)
+            from_date = date_limit.replace(day=1)
+            to_date = (date_limit + relativedelta(months=1, day=1)) - timedelta(1)
+
+        elif date_option == 'curr_month':
+            from_date = date.today().replace(day=1)
+            to_date = date.today() + dateutil.relativedelta.relativedelta(days=1)
+
+        elif date_option == 'last_year':
+            date_limit = date.today() - dateutil.relativedelta.relativedelta(years=1)
+            from_date = date_limit.replace(day=1)
+            to_date = (date_limit + relativedelta(months=12, day=1)) - timedelta(1)
+
+        elif date_option == 'curr_year':
+            date_limit = date.today() - dateutil.relativedelta.relativedelta(years=1)
+            from_date = date.today().replace(month=1, day=1)
+            to_date = date.today() + dateutil.relativedelta.relativedelta(days=1)
+
+        elif date_option == 'select_period':
+            from_date = kwargs.get('from_date')
+            to_date = kwargs.get('to_date')
+            date_selected_from = from_date
+            date_selected_to = to_date
+
+        order = 'desc'
+        warehouse_id = str(tuple(warehouse_id)) if len(warehouse_id) > 1 else "(" + str(warehouse_id[0]) + ")"
+        limit_clause = " limit'%s'" % limit_value if limit_value else ""
+
+        query = ("""select sl.name as product_name,sum(product_uom_qty),pu.name from sale_order_line sl
+                           JOIN sale_order so ON sl.order_id = so.id
+                           JOIN uom_uom pu on sl.product_uom = pu.id
+                           where so.date_order::DATE >= '%s'::DATE and
+                           so.date_order::DATE <= '%s'::DATE and
+                           sl.state = 'sale' and so.company_id = %s
+                           and so.warehouse_id in %s
+                           group by sl.name,pu.name order by sum %s""" % (from_date, to_date, company_id, warehouse_id, order)) + limit_clause
+
+        request.cr.execute(query)
+        data = request.cr.fetchall()
+        try:
+            if data:
+                return valid_response(data)
+        except Exception as e:
+            return invalid_response('exception', e.name)    
 
 
 
