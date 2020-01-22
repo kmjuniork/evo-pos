@@ -92,7 +92,7 @@ class APIController(http.Controller):
         date_selected = None
         date_selected_to = None
 
-        company_id = request.env.user.company_id
+        company_id = request.env.user.company_id.id
         warehouse_ids = request.env['stock.warehouse'].sudo().search([('company_id', '=', company_id)]).mapped('id')
         print(warehouse_ids)
         warehouse_id = kwargs.get('warehouse') if kwargs.get('warehouse') else warehouse_ids
