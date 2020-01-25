@@ -160,7 +160,7 @@ class APIController(http.Controller):
                            sl.state = 'sale' and so.company_id = %s
                            and so.warehouse_id in %s
                            group by sl.name,pu.name order by sum %s""" % (
-        from_date, to_date, company_id, warehouse_id, order)) + limit_clause
+            from_date, to_date, company_id, warehouse_id, order)) + limit_clause
 
         request.cr.execute(query)
         data = request.cr.fetchall()
@@ -198,7 +198,7 @@ class APIController(http.Controller):
         try:
             if data:
                 for arr in data:
-                    array.append({"name": arr[0],"count": arr[1]})
+                    array.append({"name": arr[0], "count": arr[1]})
                 return valid_response(array)
         except Exception as e:
             return invalid_response('exception', e.name)
@@ -265,7 +265,32 @@ class APIController(http.Controller):
         except Exception as e:
             return invalid_response('exception', e.name)
 
+    # best selling time
+    @validate_token
+    @http.route("/api/best/selling/time", type='http', auth="none", methods=['GET'], csrf=False)
+    def best_selling_time(self, **kwargs):
+        data = self.get_filter(**kwargs)
+        company_id = data.get('company_id')
+        warehouse_id = data.get('warehouse_id')
+        from_date = data.get('from_date')
+        to_date = data.get('to_date')
+        warehouse_id = str(tuple(warehouse_id)) if len(warehouse_id) > 1 else "(" + str(warehouse_id[0]) + ")"
 
-
-
-
+        query = ("""select count(date_order),date_order::time from sale_order where date_order::DATE >= '%s'::DATE and date_order::DATE <= '%s'::DATE and
+                                       state = 'sale' and company_id = %s
+                                       and warehouse_id in %s group by date_order::time"""% (
+            from_date, to_date, company_id, warehouse_id))
+        print(query)
+        request.cr.execute(query)
+        data = request.cr.fetchall()
+        delta = timedelta(hours=6.30)
+        array = []
+        try:
+            if data:
+                for arr in data:
+                    t = arr[1]
+                    # (datetime.combine(date(1, 1, 1), t) + delta).time()
+                    array.append({"count": arr[0], "time": format(t)})
+                return valid_response(array)
+        except Exception as e:
+            return invalid_response('exception', e)
