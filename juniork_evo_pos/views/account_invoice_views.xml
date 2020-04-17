@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="account_invoice_view_form_evopos" model="ir.ui.view">
+        <field name="name">account.invoice.form.evopos</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="account.invoice_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='invoice_line_ids']/tree//field[@name='quantity']" position="before">
+                <field name="flag" invisible="1"/>
+                <field name="start_time" attrs="{'readonly':[('flag','!=', True)]}"/>
+                <field name="end_time" attrs="{'readonly':[('flag','!=', True)]}"/>
+            </xpath>
+            <field name="amount_tax" position="after">
+                <field name="round_off"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>

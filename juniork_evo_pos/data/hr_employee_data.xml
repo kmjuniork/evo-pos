@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <record id="employee_mk1" model="hr.employee">
+            <field name="name">Marker Employee</field>
+            <field name="work_location">Building 1, Second Floor</field>
+            <field name="work_phone">(376)-310-7863</field>
+            <field name="work_email">markeremployee@example.com</field>
+            <field name="is_default">True</field>
+        </record>
+    </data>
+</odoo>

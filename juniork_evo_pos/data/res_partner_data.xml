@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <record id="annonymous" model="res.partner">
+            <field name="name">Annonymous User</field>
+            <field name="country_id" ref="base.us"/>
+            <field name="email">deco.addict82@example.com</field>
+            <field name="phone">(603)-996-3829</field>
+            <field name="website">http://www.deco-addict.com</field>
+            <field name="ref">098765</field>
+            <field name="is_default">True</field>
+        </record>
+    </data>
+</odoo>

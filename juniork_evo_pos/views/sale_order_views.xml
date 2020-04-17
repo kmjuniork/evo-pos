@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="sale_order_view_form_evopos" model="ir.ui.view">
+            <field name="name">sale.order.form.evopos</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+                <field name="tax_id" invisible="1"/>
+                <field name="amount_tax" invisible="1"/>
+                <field name="partner_id" position="after">
+                    <field name="voucher_no"/>
+                    <field name="table"/>
+                </field>
+                <field name="payment_term_id" position="after">
+                    <field name="employee_id"/>
+                </field>
+		        <xpath expr="//field[@name='order_line']/tree//field[@name='name']" position="after">
+                    <field name="flag" invisible="1"/>
+		            <field name="start_time" attrs = "{'readonly':[('flag','!=', True)]}"/>
+                    <field name="end_time" attrs = "{'readonly':[('flag','!=', True)]}"/>
+		        </xpath>
+                <xpath expr="//group[@name='sale_total']/div" position="before">
+                    <field name="round_off"/>
+                </xpath>
+	        </field>
+	   </record>
+    </data>
+</odoo>
